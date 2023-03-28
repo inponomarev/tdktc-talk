@@ -1,0 +1,662 @@
+= Don't Invent Data for Integration Tests, Synthesize It
+Ivan Ponomarev
+:revealjs_theme: black
+:revealjs_customtheme: white_course.css
+:revealjs_slideNumber:
+:revealjs_history:
+:revealjs_progress:
+:encoding: UTF-8
+:lang: ru
+include::_doc_general_attributes.adoc[]
+:doctype: article
+:toclevels: 3
+:imagesdir: images
+:source-highlighter: highlightjs
+:highlightjsdir: highlight
+:icons: font
+:iconfont-remote!:
+:iconfont-name: font-awesome-4.7.0/css/font-awesome
+:revealjs_mouseWheel: true
+:revealjs_center: false
+:revealjs_transition: none
+:revealjs_width: 1600
+:revealjs_height: 900
+:stem: latexmath
+
+
+//== Часть 1. Введение
+:!figure-caption:
+
+[%notitle]
+== Who am I
+
+[cols="30a,70a"]
+|===
+|image::ivan.jpg[]
+|
+
+Ivan Ponomarev
+
+* Staff Engineer @ Synthesized.io
+* Teaching Java @ МФТИ and Mainor
+
+
+|===
+
+== What do we want about tests?
+
+* Clean & neat
+* Fast running
+* Easy to write and maintain
+
+== What do we want about tests?
+
+* Clean & neat
+* Fast running
+* *Easy to write and maintain*
+
+== The tech stack 
+
+* RDBMS (PostgreSQL or others)
+* Backend: Java/Kotlin + Spring Boot
+* Restful API, frontend/other services: out of scope
+
+== A very traditional architecture
+
+[graphviz]
+----
+
+digraph G {
+graph [ fontname="Sans"; dpi = 180 ]; 
+node [fontname = "Sans"];
+rankdir="LR";
+node [shape="box"];
+Database[shape="cylinder"];
+
+subgraph cluster_FE {
+  label = "Frontend"
+Browser[shape="note",label="page\ncode"]
+}
+
+Browser -> Controller;
+
+subgraph cluster_BE {
+    label="Backend";
+Controller -> Service -> DAO;
+}
+
+
+DAO->Database;
+
+}
+----
+
+== A slippery terminology: E2E test
+
+[graphviz]
+----
+digraph G {
+graph [ fontname="Sans"; dpi = 180 ]; 
+node [fontname = "Sans"];
+
+rankdir="LR";
+node [shape="box"];
+Database[shape="cylinder"];
+
+Test[shape="none";label="Browser\nautomation\n(E2E test)"]
+
+
+
+subgraph cluster_FE {
+  label = "Frontend"
+  Browser[shape="note",label="page\ncode"]
+}
+
+{rank=same;Browser;Test}
+Test -> Browser;
+
+Browser -> Controller;
+
+subgraph cluster_BE {
+    label="Backend";
+Controller -> Service -> DAO;
+}
+
+
+DAO->Database;
+
+}
+----
+
+== A slippery terminology: integration test 
+
+(sometimes called E2E)
+
+[graphviz]
+----
+digraph G {
+graph [ fontname="Sans"; dpi = 180 ]; 
+node [fontname = "Sans"];
+rankdir="LR";
+node [shape="box"];
+Database[shape="cylinder"];
+API[shape="none";label="RESTful\nAPI"]
+
+API -> Controller;
+
+subgraph cluster_BE {
+    label="Backend";
+Controller -> Service -> DAO;
+}
+
+Test[shape="none";label="Integration\nTest"]
+Test -> API ;
+{rank=same;API;Test}
+
+DAO->Database;
+
+}
+----
+
+== A slippery terminology: component test
+
+(sometimes called integration or even unit test)
+
+[graphviz]
+----
+digraph G {
+rankdir="LR";
+graph [fontname="Sans"; dpi = 180 ]; 
+node [fontname = "Sans"; shape="box"];
+Database[shape="cylinder"];
+ServiceTest[shape="none"];
+DaoTest[shape="none"];
+Service -> DAO;
+ServiceTest[label="Service\nComponent\nTest"]
+ServiceTest -> Service ;
+{rank=same;Service;ServiceTest}
+DaoTest[label="DAO\nComponent\nTest"]
+DaoTest -> DAO
+{rank=same;DAO;DaoTest}
+DAO->Database;
+}
+----
+
+
+== Unit Test
+
+[graphviz]
+----
+digraph G {
+graph [ fontname="Sans"; dpi = 180 ]; 
+node [fontname = "Sans"];
+rankdir="LR";
+node [shape="box"];
+Mock[label="Mock\nService";style="dashed"]
+Controller -> Mock;
+Test[shape="none",label="Unit\ntest"];
+Test->Controller;
+{rank=same;Test;Controller}
+}
+----
+
+== Application under test
+
+[plantuml,dbschema,png]
+----
+@startuml
+hide circle
+skinparam dpi 180
+left to right direction 
+
+class TalkSpeakers {
+talkid
+speakerid
+}
+
+class Speaker {
+id
+name
+}
+
+class Talk {
+id
+name
+conferenceid
+status
+feedback
+}
+
+
+class Conference {
+id
+name
+}
+
+TalkSpeakers --> Speaker
+TalkSpeakers --> Talk
+Talk--> Conference
+
+@enduml
+----
+
+== Methods under test
+
+* `TalkDao.getTalksByConference(Conference conference)`  
+
+[graphviz]
+----
+digraph G {
+graph [fontname="Sans"; dpi = 180 ];
+node[fontname="Sans";shape="box";style="rounded"]
+Talk1[label="Talk:\nReactive, or not reactive: that is the question"]
+Talk2[label="Talk:\nDon't be Homer Simpson to your Reactor!"]
+Speaker1[label="Speaker:\nKirill Tolkachev"]
+Speaker2[label="Speaker:\nEvgeny Borisov"]
+Speaker3[label="Speaker:\nSergey Egorov"]
+Conference1[label="Conference:\nJPoint"]
+Talk1 -> Speaker1
+Talk1 -> Speaker2
+Talk1 -> Conference1
+Talk2 -> Speaker3
+Talk2 -> Conference1
+}
+----
+
+Must return a set of `Talk` object together with related +
+`Speaker` objects and `Conference` object
+
+== Methods under test
+
+* `TalkService.changeStatus(in talkId, Status status)`  
+
+[plantuml]
+----
+@startuml
+skinparam dpi 150
+[*] --> IN_REVIEW
+
+IN_REVIEW --> ACCEPTED : Review Successful
+IN_REVIEW --> REJECTED : Review Failed 
+
+ACCEPTED --> [*] 
+REJECTED --> [*] 
+
+note left of REJECTED
+    Feedback must
+    be provided
+end note
+
+@enduml
+----
+
+No talk should be rejected without a feedback!
+
+== Approach #1: The Golden Dump
+
+image::goldendump.jpg[]
+
+== The Golden Dump Pros and Cons
+
+[none]
+[%step]
+* image:thumbs-up.png[] A straighforward approach
+* image:thumbs-down.png[] Fragile: init script can significantly diverge from the actual schema
+
+== The Golden Dump Pros and Cons
+
+[none]
+* image:thumbs-down.png[] Obscure: what does this mean?
+
+[source,sql]
+----
+insert into talkspeakers (talkid, speakerid) values (1001, 1004);
+insert into talkspeakers (talkid, speakerid) values (1002, 1002);
+insert into talkspeakers (talkid, speakerid) values (1002, 1003);
+----
+
+== The Golden Dump Pros and Cons
+
+[none]
+* image:thumbs-down.png[] Poor cohesion: tests rely on initialization script which is in a separate file far away.
+
+Test setup relying on the script:
+[source,java]
+----
+//A talk with a feedback
+int id = 1001;
+//A talk without a feedback
+int id = 1002;
+----
+
+== The Golden Dump Pros and Cons
+
+[none]
+* image:thumbs-down.png[] Poor cohesion: tests rely on initialization script which is in a separate file far away.
+
+Assertions relying on the script:
+[source,java]
+----
+assertThat(talk.getName()).isEqualTo(
+        "Reactive, or not reactive: that is the question");
+assertThat(talk.getSpeakers().stream().map(Speaker::getName))
+        .containsExactlyInAnyOrder("Evgeny Borisov", "Kirill Tolkachev");
+assertThat(talk.getStatus()).isEqualTo(IN_REVIEW);
+----
+
+== The Golden Dump Pros and Cons
+
+[none]
+* image:thumbs-down.png[] Might be easy to write for the fist time, but time consuming to maintain.
+
+== Let's count LOC 
+
+[cols="1a,^1a"]
+|===
+|             
+|*Golden Dump*
+               
+image::goldendump.jpg[width=200]
+|SQL          |56
+|DaoTest      |58
+|ServiceTest  |40
+|*Total*      |*154*
+|===
+
+== Approach #2: Object Mother
+
+image::objectmother.jpg[]
+
+== Object Mother Pros and Cons
+
+[none]
+[%step]
+* image:thumbs-up.png[] No SQL scripts, total decoupling from  schema migrations.
+* image:thumbs-up.png[]  Type safe!
+
+== Object Mother Pros and Cons
+
+[none]
+* image:thumbs-up.png[]  Good cohesion: you can give your fixtures the meaningful names, it's easy to understand what you test.
+
+[source,java]
+----
+service.changeStatus(
+    talkWithFeedback().getId(), 
+    Status.REJECTED);
+----
+
+== Object Mother Pros and Cons
+
+[none]
+* image:shrug.png[] We have to pre-fill database with objects before the tests 
+** image:index_up.png[]  We use our own DAOs
+** image:index_up.png[]  We have to care about cleaning up the database after each test +
+(which is ok, but can be slow)
+
+== Object Mother Pros and Cons
+
+[none]
+* image:thumbs-down.png[] It's relatively easy to maintain ObjectMother class (thanks to type safety), +
+but "inventing" objects with all their attributes can be difficult
+
+== Let's count LOC
+
+[cols="1a,^1a,^1a"]
+|===
+|             
+|*Golden Dump*  
+
+image::goldendump.jpg[width=200]
+
+|*Object Mother*  
+
+image::objectmother.jpg[width=200]
+
+
+|SQL          |56             |                 
+|ObjectMother |               | 50              
+|DaoTest      |58             | 64              
+|ServiceTest  |40             | 65             
+|*Total*      |*154*          | *179*           
+|===
+
+
+== Approach #3: synthesized data
+
+image::tdk.jpg[]
+
+== Synthesized Data Pros and Cons
+
+[none]
+* image:thumbs-up.png[]image:thumbs-up.png[]image:thumbs-up.png[] We are using all the benefits of Object Mother approach, and
+** image:thumbs-up.png[] no need to "invent" test examples
+** image:thumbs-up.png[] no need to pre-fill the database using our own DAOs
+
+== Synthesized Data Pros and Cons
+[none]
+[%step]
+* image:shrug.png[]  We have to provide the config for TDK, but it's less prone to changes.
+* image:thumbs-down.png[] Little or no control for what's actually in your database, we have to modify values occasionally using our DAO
+
+== Let's count LOC
+
+[cols="1,^1a,^1a,^1a"]
+|===
+|             
+|*Golden Dump*  
+
+image::goldendump.jpg[width=200]
+
+|*Object Mother*  
+
+image::objectmother.jpg[width=200]
+
+| *TDK*
+
+image::tdk.jpg[width=200]
+
+|Config       |               |                 | 15
+|SQL          |56             |                 |
+|ObjectMother |               | 50              | 36
+|DaoTest      |58             | 64              | 47
+|ServiceTest  |40             | 65              | 44
+|*Total*      |*154*          | *179*           | *142*
+|===
+
+== TDK features
+[graphviz, "tdk.png"]
+-----
+digraph G {
+graph [ fontname="Sans"; dpi = 180 ]; 
+node [fontname = "Sans"];
+rankdir="LR";
+ node [fontsize=18];
+SourceDb [shape="cylinder"; label="Source\nDB"];
+TDK [shape="box"]
+TargetDb [shape="cylinder"; label="Target\nDB"];
+SourceDb -> TDK -> TargetDb;
+}
+-----
+
+
+image::modes.png[{image-50-width}]
+
+== No-op    
+
+[source,yaml]
+----
+# Just copy everything from the source to the target
+
+default_config:
+  mode: KEEP
+----
+
+== Data subsetting
+
+[source,yaml]
+----
+# Take 50% of the rows from the source database, 
+# do not transform the data
+
+default_config:
+  mode: KEEP
+  target_ratio: 0.5
+
+table_truncation_mode: TRUNCATE
+schema_creation_mode: CREATE_IF_NOT_EXISTS
+----
+
+== Data subsetting
+
+
+[source,yaml]
+----
+# Take 50% of the rows and mask them, 
+# but keep public.productlines as is
+
+default_config:
+  mode: MASKING
+  target_ratio: 0.5
+
+tables:
+  - table_name_with_schema: "public.productlines"
+    mode: "KEEP"
+    target_ratio: 1
+
+table_truncation_mode: TRUNCATE
+schema_creation_mode: CREATE_IF_NOT_EXISTS
+safety_mode: "RELAXED"
+----
+
+== Data masking: Before
+
+[cols="1,1,1,1,1,1"]
+|===
+|CUSTOMERNUMBER |CUSTOMERNAME | CONTACTLASTNAME | CONTACTFIRSTNAME | PHONE | ADDRESSLINE1
+
+|103
+|Atelier graphique
+|Schmitt
+|Carine
+|40.32.2555
+|54, rue Royale
+
+|112
+|Signal Gift Stores
+|King
+|Jean
+|5551838
+|8489 Strong St.
+
+|114
+|Australian Collectors, Co.
+|Ferguson
+|Peter
+|03 9520 4555
+|636 St Kilda Road
+
+|119
+|La Rochelle Gifts
+|Labrune
+|Janine
+|40.67.8555
+|67, rue des Cinquante Otages
+
+|===
+ 
+== Data masking: After
+
+[cols="1,1,1,1,1,1"]
+|===
+|CUSTOMERNUMBER |CUSTOMERNAME | CONTACTLASTNAME | CONTACTFIRSTNAME | PHONE | ADDRESSLINE1
+
+|7604416
+|Fwomnubri Jdorefqpfjn Vepbwfoe
+|Iylapd
+|Wqvj
+|7010-370953
+|Lmmejweaooyha 954
+
+|29919216
+|Ubkcg & Hhitqfm Wz
+|Hjpxftbrdybfxev
+|Rgykous
+|(72) 478-1967
+|um. Akseehys 97
+
+|65286067
+|Pwaibpu Lmypt
+|Llsrsmu
+|Grrnbqbi
+|281-942530
+|Sqy Teyfbglp qo Cdqo 21
+
+|68022786
+|Fudqrgjjycmz Sau Gsct Dms.
+|Ywsyew
+|Uurxn
+|5919048124
+|7833 Xtuvvhu Gb.
+
+|=== 
+
+== Data generation
+
+[source,yaml]
+----
+# Take the source database 
+# and generate the database twice as big with the same schema
+
+default_config:
+  mode: GENERATION
+  target_ratio: 2
+
+table_truncation_mode: TRUNCATE
+schema_creation_mode: CREATE_IF_NOT_EXISTS
+safety_mode: "RELAXED"
+----
+
+== Data generation
+
+[source,yaml]
+----
+# Same as above, 
+# but use specific generator for `public.products` table
+default_config:
+  mode: GENERATION
+  target_ratio: 2
+
+tables:
+  - table_name_with_schema: "public.products"
+    mode: "GENERATION"
+    target_ratio: 2
+    transformations:
+      - columns: [ "productname" ]
+        params:
+          type: "formatted_string_generator"
+          pattern: "[A-Z]{16}"
+
+----
+
+== A couple of dozens generators
+
+https://docs.synthesized.io/tdk/latest/user_guide/reference/transformations
+
+image::generators.png[]
+
+
+== Pagila Demo
+
+https://github.com/synthesized-io/pagila-tdk-generation
+        
+
+== Thanks for listening!
+
+Give tdk-tc a image:star.svg[width=64]!
+
+https://github.com/synthesized-io/tdk-tc
+
+icon:envelope[size=lg] ivan@synthesized.io
+
+icon:twitter[size=lg] @inponomarev
