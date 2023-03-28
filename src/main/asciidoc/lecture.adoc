@@ -43,8 +43,9 @@ Ivan Ponomarev
 
 |===
 
-== What do we want about tests?
+== What do we want from tests?
 
+[%step]
 * Clean & neat
 * Fast running
 * Easy to write and maintain
