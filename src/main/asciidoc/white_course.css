@@ -5,7 +5,10 @@
  */
 /*import url(../../lib/font/source-sans-pro/source-sans-pro.css);*/
 
-@font-face {
+@import url('https://fonts.cdnfonts.com/css/ibm-plex-sans');
+@import url('https://fonts.cdnfonts.com/css/ibm-plex-mono-3');
+
+/*@font-face {
 	font-family: "Roboto-condensed";
 	src: url(roboto-2014/RobotoCondensedRegular.ttf) format("truetype");
 	font-weight: normal;
@@ -32,9 +35,7 @@
 	font-family: "Roboto";
 	src: url(roboto-2014/Roboto-Italic.ttf) format("truetype");
 	font-style: italic; 
-}
-
-
+}*/
 
 
 section.has-dark-background, section.has-dark-background h1, section.has-dark-background h2, section.has-dark-background h3, section.has-dark-background h4, section.has-dark-background h5, section.has-dark-background h6 {
@@ -43,15 +44,21 @@ section.has-dark-background, section.has-dark-background h1, section.has-dark-ba
 /*********************************************
  * GLOBAL STYLES
  *********************************************/
+
 body {
   background: #fff;
-  background-color: #fff; }
+  background-color: #fff;
+  font-family: 'IBM Plex Sans', sans-serif;
+/*text-align: left !important;*/
+
+}
 
 .reveal {
-  font-family: Roboto, "Source Sans Pro", Helvetica, sans-serif;
+/*  font-family: Roboto, "Source Sans Pro", Helvetica, sans-serif;*/
   font-size: 24px;
   font-weight: normal;
-  color: #222; }
+  color: #15141D; 
+}
 
 ::selection {
   color: #fff;
@@ -73,33 +80,34 @@ body {
 .reveal h4,
 .reveal h5,
 .reveal h6 {
-  margin: 0 0 20px 0;
-  color: #222;
-  font-family: Roboto, "Source Sans Pro", Helvetica, sans-serif;
+  margin: 0 0 60px;
+  color: #15141D;
+/*  font-family: Roboto, "Source Sans Pro", Helvetica, sans-serif;*/
 /*  font-weight: 600;*/
   font-size: 2em;
   line-height: 1.2;
   letter-spacing: normal;
 /*  text-transform: uppercase;*/
   text-shadow: none;
-  word-wrap: break-word; }
+  word-wrap: break-word; 
+/*text-align: left;*/
+}
 
 .reveal h1 {
-  font-family: Roboto-condensed;
+/*  font-family: Roboto-condensed;*/
   font-size: 3.5em; 
-  margin-bottom: 10px;
+  margin-bottom: 25px;
   margin-top: 200px;
-  border-bottom: 2px dotted #DDD;
-  padding-bottom: 5px;
-  
-  }
+  border-bottom: 1px solid #15141D;
+  padding-bottom: 40px;
+/*text-align: center;*/
+}
 
 .reveal h2 {
-  font-size: 2.1em; 
-  padding-bottom: 10px;
-  border-bottom: 2px dotted #DDD;
-  font-family: Roboto-condensed;}
-  
+  font-size: 2.3em; 
+  padding-bottom: 25px;
+  border-bottom: 2px solid #15141D;
+}
  
 .reveal .title h2 {
   padding-bottom: 0;
@@ -121,15 +129,20 @@ body {
 .reveal p {
   margin: 10px 0;
   line-height: 1.3;
-  font-size: 1.7em;
+  font-size: 1.5em;
+/*  text-align: left;*/
+}
+
+div.ulist {
+/*	text-align: left;*/
 }
 
 /* Ensure certain elements are never larger than the slide itself */
 .reveal img,
 .reveal video,
 .reveal iframe {
-  max-width: 95%;
-  max-height: 95%; }
+  max-width: 90%;
+  max-height: 90%; }
 
 .reveal strong,
 .reveal b {
@@ -197,25 +210,35 @@ body {
   width: 95%;
   margin: 20px 0px;
   text-align: left;
-  font-size: 0.55em;
-  font-family: monospace;
+  font-size: 0.5em;
   line-height: 1.2em;
   word-wrap: break-word;
   /* box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.3); */
 }
 
 .reveal code {
-    font-family: monospace;
-    line-height: initial;
+	font-family: 'IBM Plex Mono', sans-serif;
+	line-height: initial;
+	color: #666476;
+/*	color: #fff;*/
+	background-color: #F5F6F6;
+	padding: 1px 15px 2px;
+	border-radius: 8px;
 }
 
 .reveal pre code {
-  /* display: block;*/
-  font-size: 3.1em;
+/*   display: block;*/
+  font-size: 2.5em;
   padding: 5px;
-  overflow: auto;
-  max-height: 400px;
-  word-wrap: normal; }
+/*  overflow: auto;*/
+/*  max-height: 400px;*/
+  word-wrap: normal; 
+
+background-color: #F5F6F6;
+display: block;
+padding: 20px;
+border-radius: 16px;*/
+}
   
 .reveal code.language-code {
     background: black;
@@ -226,30 +249,41 @@ body {
 .reveal table {
   margin: auto;
   border-collapse: collapse;
-  border-spacing: 0; }
+  border-spacing: 0;
+/*  font-size: 0.7em!important;*/
+
+}
 
 .reveal table th {
-  font-weight: bold;
-  font-size: 0.8em;
-  vertical-align: middle; }
+/*  font-weight: bold;*/
+/*  font-size: 1.2em;*/
+  vertical-align: middle;
+background: #000;
+color: #fff;
+padding: 10px !important;
+}
   
 .reveal table tfoot td {
   font-weight: bold;
   font-size: 1em;
-  vertical-align: middle; }
-
-  
+  vertical-align: middle; 
+}
+ 
 .reveal table th,
 .reveal table td {
   text-align: left;
   padding: 0.2em 0.5em 0.2em 0.5em;
-  border-bottom: 1px solid; 
-  border-left: double;
+/*  border-bottom: 1px solid; */
+  border-left: 1px solid;
 }
 
 .reveal table th:first-child,
 .reveal table td:first-child {
   border-left: none;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
 }
 
 .reveal table th[align="center"],
@@ -314,7 +348,6 @@ body {
     color: #2e409a;
 } 
 
-
 .reveal .title {
   font-weight: bold;
 } 
@@ -340,7 +373,7 @@ body {
 
 .reveal table th, .reveal table td {
     text-align: left;
-    padding: 0em 0.2em 0em 0.2em;
+    padding: 0em 0.2em 0em 0.5em;
 }
 
 .reveal table.tableblock {
@@ -361,7 +394,6 @@ td.valign-top {
   vertical-align: top;
 }
 
-
   
 /*********************************************
  * LINKS
@@ -380,7 +412,9 @@ td.valign-top {
 
 .reveal .roll span:after {
   color: #fff;
-  background: #1a53a1; }
+  background: #1a53a1; 
+}
+
 
 /*********************************************
  * IMAGES
@@ -442,7 +476,7 @@ td.valign-top {
 .reveal .author small {
   margin-top: 20px;
   font-size: 1.1em;
-  font-family: Roboto-condensed;
+/*  font-family: Roboto-condensed;*/
   /*font-weight: bold;*/
   color: #AAA
   /*font-style: oblique;*/

@@ -50,7 +50,7 @@ Ivan Ponomarev
 * Fast running
 * Easy to write and maintain
 
-== What do we want about tests?
+== What do we want from tests?
 
 * Clean & neat
 * Fast running
@@ -159,6 +159,23 @@ DAO->Database;
 }
 ----
 
+== Unit Test
+
+[graphviz]
+----
+digraph G {
+graph [ fontname="Sans"; dpi = 180 ]; 
+node [fontname = "Sans"];
+rankdir="LR";
+node [shape="box"];
+Mock[label="Mock\nService";style="dashed"]
+Controller -> Mock;
+Test[shape="none",label="Unit\ntest"];
+Test->Controller;
+{rank=same;Test;Controller}
+}
+----
+
 == A slippery terminology: component test
 
 (sometimes called integration or even unit test)
@@ -180,26 +197,14 @@ DaoTest[label="DAO\nComponent\nTest"]
 DaoTest -> DAO
 {rank=same;DAO;DaoTest}
 DAO->Database;
+Database[label="Database\n\nTestcontainers"]
 }
 ----
 
+== Testcontainers
 
-== Unit Test
+image::testcontainers_transparent.png[]
 
-[graphviz]
-----
-digraph G {
-graph [ fontname="Sans"; dpi = 180 ]; 
-node [fontname = "Sans"];
-rankdir="LR";
-node [shape="box"];
-Mock[label="Mock\nService";style="dashed"]
-Controller -> Mock;
-Test[shape="none",label="Unit\ntest"];
-Test->Controller;
-{rank=same;Test;Controller}
-}
-----
 
 == Application under test
 
