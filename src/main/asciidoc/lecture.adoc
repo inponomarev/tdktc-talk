@@ -302,6 +302,8 @@ No talk should be rejected without a feedback!
 
 image::goldendump.jpg[]
 
+https://github.com/inponomarev/tdktctalk-example
+
 == The Golden Dump Pros and Cons
 
 [none]
@@ -355,7 +357,7 @@ assertThat(talk.getStatus()).isEqualTo(IN_REVIEW);
 [none]
 * image:thumbs-down.png[] Might be easy to write for the fist time, but time consuming to maintain.
 
-== Let's count LOC 
+== Let's count lines of code 
 
 [cols="1a,^1a"]
 |===
@@ -372,6 +374,8 @@ image::goldendump.jpg[width=200]
 == Approach #2: Object Mother
 
 image::objectmother.jpg[]
+
+https://github.com/inponomarev/tdktctalk-example
 
 == Object Mother Pros and Cons
 
@@ -406,7 +410,7 @@ service.changeStatus(
 * image:thumbs-down.png[] It's relatively easy to maintain ObjectMother class (thanks to type safety), +
 but "inventing" objects with all their attributes can be difficult
 
-== Let's count LOC
+== Let's count lines of code
 
 [cols="1a,^1a,^1a"]
 |===
@@ -432,6 +436,8 @@ image::objectmother.jpg[width=200]
 
 image::tdk.jpg[]
 
+https://github.com/inponomarev/tdktctalk-example
+
 == Synthesized Data Pros and Cons
 
 [none]
@@ -445,7 +451,7 @@ image::tdk.jpg[]
 * image:shrug.png[]  We have to provide the config for TDK, but it's less prone to changes.
 * image:thumbs-down.png[] Little or no control for what's actually in your database, we have to modify values occasionally using our DAO
 
-== Let's count LOC
+== Let's count lines of code
 
 [cols="1,^1a,^1a,^1a"]
 |===
@@ -655,7 +661,9 @@ image::generators.png[]
 == Pagila Demo
 
 https://github.com/synthesized-io/pagila-tdk-generation
-        
+
+image::pagila.png[]
+
 
 == Thanks for listening!
 
