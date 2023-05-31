@@ -304,6 +304,94 @@ image::goldendump.jpg[]
 
 https://github.com/inponomarev/tdktctalk-example
 
+== Spinning up a subset of beans
+
+[graphviz]
+----
+digraph G {
+graph [fontname="Sans"; dpi = 180 ];
+node[fontname="Sans";shape="box";style="rounded"]
+  A[label="package a\n@SpringBootApplication"]
+  B[label="package a.b"]
+  C[label="package a.c"]
+  D[label="package a.d"]
+  E[label="package a.c.e"]
+  F[label="package a.c.f"]
+
+  A->B;
+  A->C;
+  A->D;
+  C->E;
+  C->F;
+}
+----
+
+== Spinning up a subset of beans
+
+[graphviz]
+----
+digraph G {
+graph [fontname="Sans"; dpi = 180 ];
+node[fontname="Sans";shape="box";style="rounded"]
+  A[label="package a\n@SpringBootApplication"]
+  B[label="package a.b"]
+  C[label="package a.c"]
+  D[label="package a.d"]
+  E[label="package a.c.e\n@SpringBootTest" style="rounded,filled" color="#3af062"]
+  F[label="package a.c.f"]
+
+  A->B;
+  A->C;
+  A->D;
+  C->E;
+  C->F;
+}
+----
+
+== Spinning up a subset of beans
+
+[graphviz]
+----
+digraph G {
+graph [fontname="Sans"; dpi = 180 ];
+node[fontname="Sans";shape="box";style="rounded"]
+  A[label="package a\n@SpringBootApplication"]
+  B[label="package a.b"]
+  C[label="package a.c\n@SpringBootConfiguration\nclass StopConfiguration" style="rounded,filled" color="#3af062"]
+  D[label="package a.d"]
+  E[label="package a.c.e\n@SpringBootTest" style="rounded,filled" color="#3af062"]
+  F[label="package a.c.f"]
+
+  A->B;
+  A->C;
+  A->D;
+  C->E;
+  C->F;
+}
+----
+
+== Spinning up a subset of beans
+
+[graphviz]
+----
+digraph G {
+graph [fontname="Sans"; dpi = 180 ];
+node[fontname="Sans";shape="box";style="rounded"]
+  A[label="package a\n@SpringBootApplication"]
+  B[label="package a.b"]
+  C[label="package a.c\n@SpringBootConfiguration\nclass StopConfiguration" style="rounded,filled" color="#3af062"]
+  D[label="package a.d"]
+  E[label="package a.c.e\n@SpringBootTest" style="rounded,filled" color="#3af062"]
+  F[label="package a.c.f" style="rounded,filled" color="#3af062"]
+
+  A->B;
+  A->C;
+  A->D;
+  C->E;
+  C->F;
+}
+----
+
 == The Golden Dump Pros and Cons
 
 [none]
