@@ -263,9 +263,9 @@ Speaker3[label="Speaker:\nSergey Egorov"]
 Conference1[label="Conference:\nJPoint"]
 Talk1 -> Speaker1
 Talk1 -> Speaker2
-Talk1 -> Conference1
+Conference1 -> Talk1[dir=back]
 Talk2 -> Speaker3
-Talk2 -> Conference1
+Conference1 -> Talk2[dir=back]
 }
 ----
 
